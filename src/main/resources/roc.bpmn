@@ -1,0 +1,165 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" id="Definitions_1ub8lxm" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="3.1.0">
+  <bpmn:process id="roc" name="Roc" isExecutable="true">
+    <bpmn:startEvent id="StartEvent_1" name="Process Starts">
+      <bpmn:outgoing>SequenceFlow_0un6boo</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:sequenceFlow id="SequenceFlow_0un6boo" sourceRef="StartEvent_1" targetRef="ServiceTask_MinistryReceivablesTeam" />
+    <bpmn:parallelGateway id="ParallelGateway" name="parallelGateway">
+      <bpmn:incoming>MinistryMain</bpmn:incoming>
+      <bpmn:outgoing>ParallelGate</bpmn:outgoing>
+      <bpmn:outgoing>ParallelGatew</bpmn:outgoing>
+    </bpmn:parallelGateway>
+    <bpmn:sequenceFlow id="SequenceFlow_1c3utsl" sourceRef="ServiceTask_MainTask" targetRef="EndEvent_11xtdgr" />
+    <bpmn:serviceTask id="ServiceTask_MinistryReceivablesTeam" name="Ministry Receivables Team - &#10;Main Task" camunda:asyncBefore="true" camunda:delegateExpression="#{startRocAdapter}">
+      <bpmn:extensionElements>
+        <camunda:failedJobRetryTimeCycle>R5/PT1M</camunda:failedJobRetryTimeCycle>
+      </bpmn:extensionElements>
+      <bpmn:incoming>SequenceFlow_0un6boo</bpmn:incoming>
+      <bpmn:outgoing>MinistryMain</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:sequenceFlow id="ParallelGate" name="parallelGateway" sourceRef="ParallelGateway" targetRef="ServiceTask_Ministry" />
+    <bpmn:serviceTask id="ServiceTask_Ministry" name="Ministry Receivables Team" camunda:delegateExpression="#{ministryRecivableAdapter}">
+      <bpmn:incoming>ParallelGate</bpmn:incoming>
+      <bpmn:outgoing>SequenceFlow_13hwy2j</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:sequenceFlow id="ParallelGatew" name="parallelGateway" sourceRef="ParallelGateway" targetRef="ServiceTask_PrepaidRedemption" />
+    <bpmn:serviceTask id="ServiceTask_PrepaidRedemption" name="Prepaid Redemption Team" camunda:delegateExpression="#{prepaidRedemptionAdapter}">
+      <bpmn:incoming>ParallelGatew</bpmn:incoming>
+      <bpmn:outgoing>SequenceFlow_1hjbnol</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:sequenceFlow id="SequenceFlow_0ow2bhs" name="closed" sourceRef="ExclusiveGateway_03u8py5" targetRef="ServiceTask_MainTask">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">#{result}</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:serviceTask id="ServiceTask_MainTask" name="Main Task - &#10;(Sub Tasks Completed)" camunda:delegateExpression="#{mainTaskAdapter}">
+      <bpmn:incoming>SequenceFlow_0ow2bhs</bpmn:incoming>
+      <bpmn:outgoing>SequenceFlow_1c3utsl</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:sequenceFlow id="MinistryMain" name="mainGate" sourceRef="ServiceTask_MinistryReceivablesTeam" targetRef="ParallelGateway" />
+    <bpmn:sequenceFlow id="SequenceFlow_04dz9tj" sourceRef="FParallelGateway" targetRef="ExclusiveGateway_03u8py5" />
+    <bpmn:endEvent id="EndEvent_11xtdgr" name="Process Ends">
+      <bpmn:incoming>SequenceFlow_1c3utsl</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:parallelGateway id="FParallelGateway" name="parallelGateway">
+      <bpmn:incoming>SequenceFlow_13hwy2j</bpmn:incoming>
+      <bpmn:incoming>SequenceFlow_1hjbnol</bpmn:incoming>
+      <bpmn:outgoing>SequenceFlow_04dz9tj</bpmn:outgoing>
+    </bpmn:parallelGateway>
+    <bpmn:exclusiveGateway id="ExclusiveGateway_03u8py5">
+      <bpmn:incoming>SequenceFlow_04dz9tj</bpmn:incoming>
+      <bpmn:outgoing>SequenceFlow_0ow2bhs</bpmn:outgoing>
+      <bpmn:outgoing>SequenceFlow_0e8eexn</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:sequenceFlow id="SequenceFlow_13hwy2j" sourceRef="ServiceTask_Ministry" targetRef="FParallelGateway" />
+    <bpmn:sequenceFlow id="SequenceFlow_1hjbnol" sourceRef="ServiceTask_PrepaidRedemption" targetRef="FParallelGateway" />
+    <bpmn:endEvent id="EndEvent_0xvu89g" name="Process failed">
+      <bpmn:incoming>SequenceFlow_0e8eexn</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="SequenceFlow_0e8eexn" sourceRef="ExclusiveGateway_03u8py5" targetRef="EndEvent_0xvu89g" />
+  </bpmn:process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="roc">
+      <bpmndi:BPMNShape id="_BPMNShape_StartEvent_2" bpmnElement="StartEvent_1">
+        <dc:Bounds x="174" y="221" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="156" y="264" width="73" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="SequenceFlow_0un6boo_di" bpmnElement="SequenceFlow_0un6boo">
+        <di:waypoint x="210" y="239" />
+        <di:waypoint x="332" y="239" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="ParallelGateway_0nkeoqe_di" bpmnElement="ParallelGateway">
+        <dc:Bounds x="492" y="214" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="559" y="229" width="80" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="SequenceFlow_1c3utsl_di" bpmnElement="SequenceFlow_1c3utsl">
+        <di:waypoint x="1383" y="239" />
+        <di:waypoint x="1449" y="239" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="ServiceTask_0sohrth_di" bpmnElement="ServiceTask_MinistryReceivablesTeam">
+        <dc:Bounds x="332" y="199" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="SequenceFlow_0g1hj5z_di" bpmnElement="ParallelGate">
+        <di:waypoint x="517" y="214" />
+        <di:waypoint x="517" y="121" />
+        <di:waypoint x="752" y="121" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="436" y="150" width="80" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="ServiceTask_0km5xvk_di" bpmnElement="ServiceTask_Ministry">
+        <dc:Bounds x="752" y="81" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="SequenceFlow_1f8il84_di" bpmnElement="ParallelGatew">
+        <di:waypoint x="517" y="264" />
+        <di:waypoint x="517" y="352" />
+        <di:waypoint x="752" y="352" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="551" y="368" width="80" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="ServiceTask_1ndnpy7_di" bpmnElement="ServiceTask_PrepaidRedemption">
+        <dc:Bounds x="752" y="312" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="SequenceFlow_0ow2bhs_di" bpmnElement="SequenceFlow_0ow2bhs">
+        <di:waypoint x="1222" y="239" />
+        <di:waypoint x="1283" y="239" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1113" y="221" width="32" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="ServiceTask_13ckbsn_di" bpmnElement="ServiceTask_MainTask">
+        <dc:Bounds x="1283" y="199" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="SequenceFlow_1amrhzr_di" bpmnElement="MinistryMain">
+        <di:waypoint x="432" y="239" />
+        <di:waypoint x="492" y="239" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="438" y="221" width="48" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SequenceFlow_04dz9tj_di" bpmnElement="SequenceFlow_04dz9tj">
+        <di:waypoint x="1106" y="239" />
+        <di:waypoint x="1172" y="239" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="EndEvent_1aq78vu_di" bpmnElement="EndEvent_11xtdgr">
+        <dc:Bounds x="1449" y="221" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1433" y="264" width="69" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ParallelGateway_1dqwdie_di" bpmnElement="FParallelGateway">
+        <dc:Bounds x="1056" y="214" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="964" y="229" width="80" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ExclusiveGateway_0uqlw5g_di" bpmnElement="ExclusiveGateway_03u8py5" isMarkerVisible="true">
+        <dc:Bounds x="1172" y="214" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="SequenceFlow_13hwy2j_di" bpmnElement="SequenceFlow_13hwy2j">
+        <di:waypoint x="852" y="121" />
+        <di:waypoint x="1081" y="121" />
+        <di:waypoint x="1081" y="214" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SequenceFlow_1hjbnol_di" bpmnElement="SequenceFlow_1hjbnol">
+        <di:waypoint x="852" y="352" />
+        <di:waypoint x="1081" y="352" />
+        <di:waypoint x="1081" y="264" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="EndEvent_0xvu89g_di" bpmnElement="EndEvent_0xvu89g">
+        <dc:Bounds x="1179" y="324" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1162" y="367" width="70" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="SequenceFlow_0e8eexn_di" bpmnElement="SequenceFlow_0e8eexn">
+        <di:waypoint x="1197" y="264" />
+        <di:waypoint x="1197" y="324" />
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>
