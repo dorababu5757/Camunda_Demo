@@ -105,8 +105,8 @@ public class Application {
 		mailSender.setHost("smtp.gmail.com");
 		mailSender.setPort(587);
 
-		mailSender.setUsername("dorababu5757@gmail.com");
-		mailSender.setPassword("Telugu*5757");
+		mailSender.setUsername("test@gmail.com");
+		mailSender.setPassword("*****");
 
 		Properties props = mailSender.getJavaMailProperties();
 		props.put("mail.transport.protocol", "smtp");
